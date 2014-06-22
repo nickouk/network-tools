@@ -11,6 +11,7 @@ import re
 import datetime
 import time
 import sys
+import getpass
 
 from grab_configs import status_update
 from grab_configs import raw_input_def
@@ -60,13 +61,13 @@ if __name__ == "__main__":
     while True:
         cust = raw_input_def("Input the customer info file [%s]: " % def_cust,def_cust)
         username = raw_input_def("Input SSH username [%s]: " % def_user,def_user)
-        password = raw_input_def("Input SSH password: ","")
-        user_command = raw_input_def("Input command: ","")
+        password = getpass.getpass("Input SSH password: ")
+        user_command = raw_input("Input command to execute on all devices: ")
 
         print "\n"
         print cust
         print username
-        print password
+        print "**PASSWORD HIDDEN**"
         print user_command
 
         yesno = raw_input("\nAre these details correct [y/n]: ").lower()
@@ -97,7 +98,7 @@ if __name__ == "__main__":
 
         if '#' in ip_addr:
             print "Skipping %s" % (ip_addr.split("#")[1])
-            #status_update(ip_addr.split("#")[1],"","Skipped.")
+            status_update(cust_dir,ip_addr.split("#")[1],"","Skipped.")
             continue
 
         '''
@@ -124,11 +125,11 @@ if __name__ == "__main__":
             ssh.connect(ip_addr,username=username,password=password,timeout=8)
         except paramiko.ssh_exception.AuthenticationException:
             print "Authentication failed."
-            status_update(ip_addr,"","Authentication failed.")
+            status_update(cust_dir,ip_addr,"","Authentication failed.")
             continue
         except socket.error:
             print "Could not connect."
-            status_update(ip_addr,"","Connection error.")
+            status_update(cust_dir,ip_addr,"","Connection error.")
             continue
 
         print_flush("[ Connection established ]")
