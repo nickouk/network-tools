@@ -32,6 +32,35 @@ import sys
 Functions
 '''
 
+def get_defaults():
+
+    '''this function reads in defaults for the user inputs for the customer dir and user name
+    tools.pref should exist in the same directory as the tools
+
+    same tools.pref:
+
+    acme-ltd.info
+    username
+
+    '''
+
+    try:
+        fileh = open("tools.pref")
+    except IOError:
+        return ['','']
+    prefs = fileh.read().split()
+    fileh.close()
+
+    try:
+        if prefs[1]:
+            pass
+    except IndexError:
+        prefs.append('')
+
+    return prefs
+
+
+
 def clean_ansi(output):
 
     # Clean up the dirty HP formatting
@@ -117,6 +146,9 @@ if __name__ == "__main__":
     ssh.set_missing_host_key_policy(
             paramiko.AutoAddPolicy())
 
+    # read defaults
+
+    (def_cust,def_user) = get_defaults()
 
     print
     print "============================="
@@ -128,8 +160,8 @@ if __name__ == "__main__":
     '''
 
     while True:
-        cust = raw_input_def("Input the customer info file : ","")
-        username = raw_input_def("Input SSH username : ","")
+        cust = raw_input_def("Input the customer info file [%s]: " % def_cust,def_cust)
+        username = raw_input_def("Input SSH username [%s]: " % def_user,def_user)
         password = raw_input("Input SSH password: ")
 
         print "\n"

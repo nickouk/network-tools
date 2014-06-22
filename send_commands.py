@@ -17,6 +17,7 @@ from grab_configs import raw_input_def
 from grab_configs import shell_send
 from grab_configs import print_flush
 from grab_configs import clean_ansi
+from grab_configs import get_defaults
 
 '''
 Functions
@@ -47,14 +48,18 @@ if __name__ == "__main__":
     ssh.set_missing_host_key_policy(
             paramiko.AutoAddPolicy())
 
+    # read defaults
+
+    (def_cust,def_user) = get_defaults()
+
 
     print "\n============================"
     print "Send commands to all devices"
     print "============================\n"
 
     while True:
-        cust = raw_input_def("Input the customer info file : ","")
-        username = raw_input_def("Input SSH username : ","")
+        cust = raw_input_def("Input the customer info file [%s]: " % def_cust,def_cust)
+        username = raw_input_def("Input SSH username [%s]: " % def_user,def_user)
         password = raw_input_def("Input SSH password: ","")
         user_command = raw_input_def("Input command: ","")
 
@@ -119,11 +124,11 @@ if __name__ == "__main__":
             ssh.connect(ip_addr,username=username,password=password,timeout=8)
         except paramiko.ssh_exception.AuthenticationException:
             print "Authentication failed."
-            #status_update(ip_addr,"","Authentication failed.")
+            status_update(ip_addr,"","Authentication failed.")
             continue
         except socket.error:
             print "Could not connect."
-            #status_update(ip_addr,"","Connection error.")
+            status_update(ip_addr,"","Connection error.")
             continue
 
         print_flush("[ Connection established ]")
