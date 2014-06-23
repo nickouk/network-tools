@@ -159,7 +159,7 @@ if __name__ == "__main__":
             # Press enter,turn off paging,grab config
             shell_send("",1,1000,shell)
             shell_send("no page",1,500,shell)
-            command_output = shell_send(user_command,15,2000,shell)
+            command_output = shell_send(user_command,15,65535,shell)
             ssh.close()
 
         command_output = clean_ansi(command_output)

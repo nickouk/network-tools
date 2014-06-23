@@ -199,7 +199,7 @@ if __name__ == "__main__":
 
         if '#' in ip_addr:
             print "Skipping %s" % (ip_addr.split("#")[1])
-            status_update(cust_dir,ip_addr.split("#")[1],"","Skipped.")
+            status_update(cust_dir,ip_addr.split("#")[1],"","*** Skipped. ***")
             continue
 
         '''
@@ -226,11 +226,11 @@ if __name__ == "__main__":
             ssh.connect(ip_addr,username=username,password=password,timeout=8)
         except paramiko.ssh_exception.AuthenticationException:
             print "Authentication failed."
-            status_update(cust_dir,ip_addr,"","Authentication failed.")
+            status_update(cust_dir,ip_addr,"","*** Authentication failed. ***")
             continue
         except socket.error:
             print "Could not connect."
-            status_update(cust_dir,ip_addr,"","Connection error.")
+            status_update(cust_dir,ip_addr,"","*** Connection error. ***")
             continue
 
         print_flush("[ Connection established ]")
@@ -266,11 +266,14 @@ if __name__ == "__main__":
             config = clean_ansi(config)
 
         # Use regex to find the hostname in the config
-        hostname = get_hostname(config) + ".txt"
+        try:
+            hostname = get_hostname(config) + ".txt"
+        except TypeError:
+            hostname = ".txt"
 
         if hostname == ".txt":
-            print "Could not determine the hostname."
-            status_update(cust_dir,ip_addr,"","Could not discover the hostname.")
+            print " !!! Could not determine the hostname. !!!"
+            status_update(cust_dir,ip_addr,"","*** Could not discover the hostname. ***")
             continue
 
 
