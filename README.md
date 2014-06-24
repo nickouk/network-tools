@@ -13,6 +13,11 @@ Paramiko - https://github.com/paramiko/paramiko
 Overview
 --------
 
+grab_configs.py - will log onto each device and download the latest config  
+send_commands.py - will send a command to each device and store the output as 'command.log' in the customer dir.  
+
+grab_configs.py contains function defintions for all modules in this repositiory.
+
 All tools require a 'cust.info' file located in the same directory as the network tools.  The 'cust.info' file should be in the following format:
 
 acme-ltd            \# customer directory should already exist, this must be the first line in the file  
@@ -25,8 +30,4 @@ From the example above you must have created a directory named 'acme-ltd'.  Do n
 
 You can have multiple customer.info files and directories for working on different sets of devices.  They can be for different customers, or departments etc.
 
-grab_configs.py - will log onto each device and download the latest config
-send_commands.py - will send a command to each device and store the output as 'command.log' in the custoemr dir.
-
-grab_configs.py contains function defintions for all modules in this repositiory.
 
