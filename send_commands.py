@@ -24,17 +24,17 @@ from grab_configs import get_defaults
 Functions
 '''
 
-def update_output_log(ip_addr,command_output):
+def update_output_log(log_cust_dir, log_ip_addr, log_command_output):
 
     '''
     This function updates the command.log
     '''
 
-    filename = "".join([cust_dir,"/command.log"])
-    fileh = open(filename,"a")
-    fileh.write("\n" + ip_addr + "\n")
-    fileh.write(command_output)
-    fileh.close()
+    filename = "".join([log_cust_dir, "/command.log"])
+    log_fileh = open(filename, "a")
+    log_fileh.write("\n" + log_ip_addr + "\n")
+    log_fileh.write(log_command_output)
+    log_fileh.close()
     return
 
 '''
@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     # read defaults
 
-    (def_cust,def_user) = get_defaults()
+    (def_cust, def_user) = get_defaults()
 
 
     print "\n============================"
@@ -59,8 +59,8 @@ if __name__ == "__main__":
     print "============================\n"
 
     while True:
-        cust = raw_input_def("Input the customer info file [%s]: " % def_cust,def_cust)
-        username = raw_input_def("Input SSH username [%s]: " % def_user,def_user)
+        cust = raw_input_def("Input the customer info file [%s]: " % def_cust, def_cust)
+        username = raw_input_def("Input SSH username [%s]: " % def_user, def_user)
         password = getpass.getpass("Input SSH password: ")
         user_command = raw_input("Input command to execute on all devices: ")
 
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
         if '#' in ip_addr:
             print "Skipping %s" % (ip_addr.split("#")[1])
-            status_update(cust_dir,ip_addr.split("#")[1],"","Skipped.")
+            status_update(cust_dir, ip_addr.split("#")[1], "", "Skipped.")
             continue
 
         '''
@@ -122,14 +122,14 @@ if __name__ == "__main__":
         print_flush("Establishing connection to %-15s > " % (ip_addr))
 
         try:
-            ssh.connect(ip_addr,username=username,password=password,timeout=8)
+            ssh.connect(ip_addr, username=username, password=password, timeout=8)
         except paramiko.ssh_exception.AuthenticationException:
             print "Authentication failed."
-            status_update(cust_dir,ip_addr,"","Authentication failed.")
+            status_update(cust_dir, ip_addr, "", "Authentication failed.")
             continue
         except socket.error:
             print "Could not connect."
-            status_update(cust_dir,ip_addr,"","Connection error.")
+            status_update(cust_dir, ip_addr, "", "Connection error.")
             continue
 
         print_flush("[ Connection established ]")
@@ -142,8 +142,8 @@ if __name__ == "__main__":
         print_flush("[ sending command ]")
 
         '''
-        HP does not support exec_command so we will use an interactive session for HP devices
-        for cisco we will use the 'cleaner' exec_command method
+        HP does not support exec_command so we will use an interactive session
+        for HP devices. For cisco we will use the 'cleaner' exec_command method
         '''
 
         if not hp:
@@ -157,9 +157,9 @@ if __name__ == "__main__":
             output = shell.recv(2000)
 
             # Press enter,turn off paging,grab config
-            shell_send("",1,1000,shell)
-            shell_send("no page",1,500,shell)
-            command_output = shell_send(user_command,15,65535,shell)
+            shell_send("", 1, 1000, shell)
+            shell_send("no page", 1, 500, shell)
+            command_output = shell_send(user_command, 15, 65535, shell)
             ssh.close()
 
         command_output = clean_ansi(command_output)
@@ -168,7 +168,7 @@ if __name__ == "__main__":
         Store the output
         '''
 
-        update_output_log(ip_addr,command_output)
+        update_output_log(cust_dir, ip_addr, command_output)
         print " [ Output captured ]"
 
         '''
