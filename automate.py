@@ -247,7 +247,7 @@ if __name__ == "__main__":
 
         hp = False
         dev_specific = False
-        telnet = True
+        telnet = False
         if ":" in ip_addr:
             type_list = ip_addr.split(":")
             ip_addr = type_list[0]
