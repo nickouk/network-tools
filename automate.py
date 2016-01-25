@@ -247,7 +247,7 @@ if __name__ == "__main__":
 
         hp = False
         dev_specific = False
-        telnet = False
+        telnet = True
         if ":" in ip_addr:
             type_list = ip_addr.split(":")
             ip_addr = type_list[0]
@@ -255,7 +255,7 @@ if __name__ == "__main__":
                 var = type_list[x]
                 var_list = var.split(",")
                 var_type = var_list[0]
-                if var_type == "model": hp = True
+                if var_type == "model" or var_type == "hp": hp = True
                 if var_type == "conn": telnet = True
                 if var_type == "user":
                     dev_specific = True
@@ -290,6 +290,10 @@ if __name__ == "__main__":
                 print "Authentication failed (SSH)."
                 status_update(cust_dir, ip_addr, "", "*** Authentication failed. ***")
                 continue
+            except paramiko.ssh_exception.SSHException:
+                print "Authentication failed (SSH)."
+                status_update(cust_dir, ip_addr, "", "*** Authentication failed. ***")
+                continue
             except socket.error:
                 print "Could not connect (SSH)."
                 status_update(cust_dir, ip_addr, "", "*** Connection error (SSH). ***")
@@ -300,6 +304,11 @@ if __name__ == "__main__":
             except socket.error:
                 print "Could not connect (Telnet)."
                 status_update(cust_dir, ip_addr, "", "*** Connection error (Telnet). ***")
+                continue
+
+            except EOFError:
+                print "Connection closed (Telnet)."
+                status_update(cust_dir, ip_addr, "", "*** Connection closed (Telnet). ***")
                 continue
 
             shell.read_very_eager()
@@ -335,6 +344,9 @@ if __name__ == "__main__":
             # Cisco Device
             stdin, stdout, stderr = ssh.exec_command(cmd)
             cmd_output = stdout.read()
+            if cmd != "show run":
+                print_flush("[ " + cmd + " ]")
+                update_cmd_log(cust_dir, ip_addr, cmd_output)
         else:
             # HP Device, or enable password, or telnet
             if not telnet:
@@ -359,7 +371,9 @@ if __name__ == "__main__":
             shell_send(paging, 1, 500, shell, telnet)
 
             for cmd_loop in cmd_list:
-                cmd_output = shell_send(cmd_loop, 6, 65535, shell, telnet)
+                wait_time = 6
+                #if cmd_loop == "show run":wait_time = 12
+                cmd_output = shell_send(cmd_loop, wait_time, 65535, shell, telnet)
                 if hp:
                     cmd_output = clean_ansi(cmd_output)
                 if cmd != "show run":
